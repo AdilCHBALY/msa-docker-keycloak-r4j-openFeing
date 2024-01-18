@@ -1,0 +1,148 @@
+<hlm-table class="w-full">
+  <hlm-trow>
+    <hlm-th class="w-52">Libelle</hlm-th>
+    <hlm-th class="w-60">Description</hlm-th>
+    <hlm-th class="w-40">Taux</hlm-th>
+    <hlm-th class="w-40">Created At</hlm-th>
+    <hlm-th class="w-40">Actions</hlm-th>
+  </hlm-trow>
+  <hlm-scroll-area class="h-[500px]">
+    @for (invoice of CATEGORY_DATA; track invoice.libelle) {
+    <hlm-trow>
+      <hlm-td truncate class="w-52 font-medium">{{ invoice.libelle }}</hlm-td>
+      <hlm-td class="w-60">{{ invoice.description }}</hlm-td>
+      <hlm-td
+        class="w-40 flex items-center gap-x-1"
+        *ngIf="invoice.taux.taux != null"
+      >
+        <div *ngIf="invoice.taux.augmented" class="text-emerald-500">
+          {{ invoice.taux.taux }}DH/m²
+        </div>
+        <div *ngIf="!invoice.taux.augmented" class="text-rose-500">
+          {{ invoice.taux.taux }}DH/m²
+        </div>
+        <div *ngIf="invoice.taux.augmented" class="text-emerald-500">
+          <i class="fa-solid fa-caret-up"></i>
+        </div>
+        <div *ngIf="!invoice.taux.augmented" class="text-rose-500">
+          <i class="fa-solid fa-sort-down"></i>
+        </div>
+      </hlm-td>
+      <hlm-td
+        class="w-40 flex items-center gap-x-1 text-zinc-500"
+        *ngIf="invoice.taux.taux == null"
+      >
+        N/A
+      </hlm-td>
+      <hlm-td class="w-40">{{ invoice.createdAt }}</hlm-td>
+      <hlm-td class="w-40 flex items-center gap-x-1">
+        <button
+          variant="ghost"
+          class="flex items-center text-rose-500 cursor-pointer hover:text-rose-400"
+          hlmBtn
+          (click)="onDelete(invoice.id)"
+        >
+          <i class="fa-regular fa-trash-can"></i>
+        </button>
+        <hlm-dialog>
+          <button
+            variant="ghost"
+            class="flex items-center text-blue-500 cursor-pointer hover:text-blue-400"
+            id="edit-profile"
+            brnDialogTrigger
+            hlmBtn
+          >
+            <i class="fa-solid fa-pen"></i>
+          </button>
+          <hlm-dialog-content
+            class="sm:max-w-[425px]"
+            *brnDialogContent="let ctx"
+          >
+            <form
+              [formGroup]="categoryForm"
+              (ngSubmit)="onEditCategory(invoice.id)"
+            >
+              <hlm-dialog-header>
+                <h3 hlmDialogTitle>Edit {{ invoice.libelle }}</h3>
+                <p hlmDialogDescription>
+                  Make changes to your category here. Click save when you're
+                  done.
+                </p>
+              </hlm-dialog-header>
+              <div class="grid gap-4 py-4">
+                <div class="grid grid-cols-4 items-center gap-4">
+                  <label hlmLabel for="libelle" class="text-right"
+                    >Libelle</label
+                  >
+                  <input
+                    hlmInput
+                    id="libelle"
+                    class="col-span-3"
+                    formControlName="libelle"
+                  />
+                </div>
+                <div class="grid grid-cols-4 items-center gap-4">
+                  <label hlmLabel for="description" class="text-right"
+                    >Description</label
+                  >
+                  <input
+                    hlmInput
+                    id="description"
+                    class="col-span-3"
+                    formControlName="description"
+                  />
+                </div>
+              </div>
+              <hlm-dialog-footer>
+                <button hlmBtn type="submit">Save changes</button>
+              </hlm-dialog-footer>
+            </form>
+          </hlm-dialog-content>
+        </hlm-dialog>
+        <hlm-dialog>
+          <button
+            variant="ghost"
+            class="flex items-center text-emerald-500 cursor-pointer hover:text-emerald-400"
+            id="edit-rating"
+            brnDialogTrigger
+            hlmBtn
+          >
+            <i class="fa-solid fa-chart-simple"></i>
+          </button>
+          <hlm-dialog-content
+            class="sm:max-w-[425px]"
+            *brnDialogContent="let ctx"
+          >
+            <form [formGroup]="rateForm" (ngSubmit)="onAddTaux(invoice.id)">
+              <hlm-dialog-header>
+                <h3 hlmDialogTitle>Add Rating For {{ invoice.libelle }}</h3>
+                <p hlmDialogDescription>
+                  Make changes to your profile here. Click save when you're
+                  done.
+                </p>
+              </hlm-dialog-header>
+              <div class="grid gap-4 py-4">
+                <div class="grid grid-cols-4 items-center gap-4">
+                  <label hlmLabel for="taux" class="text-right">Taux</label>
+                  <input
+                    hlmInput
+                    id="taux"
+                    type="number"
+                    class="col-span-3"
+                    min="0"
+                    max="50"
+                    formControlName="taux"
+                  />
+                </div>
+              </div>
+              <hlm-dialog-footer>
+                <button hlmBtn type="submit">Save changes</button>
+              </hlm-dialog-footer>
+            </form>
+          </hlm-dialog-content>
+        </hlm-dialog>
+      </hlm-td>
+    </hlm-trow>
+    }</hlm-scroll-area
+  >
+</hlm-table>

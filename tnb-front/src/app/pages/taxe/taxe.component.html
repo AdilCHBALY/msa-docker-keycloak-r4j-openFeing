@@ -1,0 +1,67 @@
+<div class="flex-col space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="font-bold text-2xl">Taxes</div>
+      <div class="text-sm text-orange-400">Manage your taxes</div>
+    </div>
+    <hlm-dialog>
+      <button id="edit-profile" brnDialogTrigger hlmBtn>Add Taxes</button>
+      <hlm-dialog-content class="sm:max-w-[425px]" *brnDialogContent="let ctx">
+        <form [formGroup]="taxeForm" (ngSubmit)="onAddTaxe()">
+        <hlm-dialog-header>
+          <h3 hlmDialogTitle>Add a Taxe</h3>
+          <p hlmDialogDescription>
+            Make changes to your taux here. Click save when you're done.
+          </p>
+        </hlm-dialog-header>
+        <div class="grid gap-4 py-4">
+          <div class="grid grid-cols-4 items-center gap-4">
+            <label hlmLabel for="label" class="text-right">Label</label>
+            <input hlmInput id="label" formControlName="label" class="col-span-3" />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <label hlmLabel for="date" class="text-right">Due Time</label>
+            <input hlmInput id="date" formControlName="dueTime" class="col-span-3" type="datetime-local" />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <label
+              for="countries"
+              class="block mb-2 font-medium text-gray-900 dark:text-white text-right"
+              >Select a Slot</label
+            >
+            <select
+              id="countries"
+              formControlName="terrain_id"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500 col-span-3"
+            >
+              <option selected>Choose a Slot</option>
+              @for(terrain of TERRAIN_DATA; track terrain.name ){
+              <option value="{{terrain.id}}">{{terrain.name}}</option>
+              }
+            </select>
+          </div>
+
+          <div class="grid grid-cols-4 items-center gap-4">
+            <label hlmLabel for="description" class="text-right"
+              >Description</label
+            >
+            <textarea
+              hlmInput
+              name="description"
+              formControlName="description"
+              placeholder="Type your message here."
+              class="col-span-3"
+            ></textarea>
+          </div>
+        </div>
+        <hlm-dialog-footer>
+          <button hlmBtn type="submit">Save</button>
+        </hlm-dialog-footer>
+        </form>
+      </hlm-dialog-content>
+    </hlm-dialog>
+  </div>
+  <div class="flex items-center justify-center">
+    <app-taux-data-table></app-taux-data-table>
+  </div>
+</div>

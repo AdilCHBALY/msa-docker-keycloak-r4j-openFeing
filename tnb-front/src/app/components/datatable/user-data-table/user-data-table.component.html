@@ -1,0 +1,29 @@
+<hlm-table class="w-full">
+  <hlm-trow>
+    <hlm-th class="w-52">Full Name</hlm-th>
+    <hlm-th class="w-60">Username</hlm-th>
+    <hlm-th class="w-40">Email</hlm-th>
+    <hlm-th class="w-40">Role</hlm-th>
+    <hlm-th class="w-40">Address</hlm-th>
+  </hlm-trow>
+  <hlm-scroll-area class="h-[400px]">
+    @for (invoice of USER_DATA; track invoice.username) {
+    <hlm-trow>
+      <hlm-td truncate class="w-52">{{ invoice.full_name }}</hlm-td>
+      <hlm-td class="w-60">{{ invoice.username }}</hlm-td>
+      <hlm-td class="w-40">{{ invoice.email }}</hlm-td>
+      <hlm-td class="w-40"
+        ><div
+          [ngClass]="{
+            'text-rose-500': invoice.role === 'ADMIN',
+            'text-emerald-500': invoice.role === 'USER',
+          }"
+        >
+          {{ invoice.role }}
+        </div></hlm-td
+      >
+      <hlm-td class="w-40">{{ invoice.addresse }}</hlm-td>
+    </hlm-trow>
+    }</hlm-scroll-area
+  >
+</hlm-table>

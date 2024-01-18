@@ -1,0 +1,62 @@
+<div class="flex-col space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="font-bold text-2xl">Category</div>
+      <div class="text-sm text-orange-400">Manage your categories</div>
+    </div>
+    <hlm-dialog>
+      <button id="edit-profile" brnDialogTrigger hlmBtn>Add Category</button>
+      <hlm-dialog-content class="sm:max-w-[425px]" *brnDialogContent="let ctx">
+        <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+          <hlm-dialog-header>
+            <h3 hlmDialogTitle>Add a category</h3>
+            <p hlmDialogDescription>
+              Make changes to your category here. Click save when you're done.
+            </p>
+          </hlm-dialog-header>
+          <div class="grid gap-4 py-4">
+            <div class="grid grid-cols-4 items-center gap-4">
+              <label hlmLabel for="libelle" class="text-right">Libelle</label>
+              <input
+                hlmInput
+                id="libelle"
+                formControlName="libelle"
+                class="col-span-3"
+              />
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+              <label hlmLabel for="taux" class="text-right">Taux</label>
+              <input
+                hlmInput
+                id="taux"
+                type="number"
+                class="col-span-3"
+                min="0"
+                max="50"
+                formControlName="taux"
+              />
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+              <label hlmLabel for="description" class="text-right"
+                >Description</label
+              >
+              <textarea
+                hlmInput
+                name="description"
+                placeholder="Type your message here."
+                class="col-span-3"
+                formControlName="description"
+              ></textarea>
+            </div>
+          </div>
+          <hlm-dialog-footer>
+            <button hlmBtn type="submit">Save changes</button>
+          </hlm-dialog-footer>
+        </form>
+      </hlm-dialog-content>
+    </hlm-dialog>
+  </div>
+  <div class="flex items-center justify-center w-full">
+    <app-category-data-table></app-category-data-table>
+  </div>
+</div>

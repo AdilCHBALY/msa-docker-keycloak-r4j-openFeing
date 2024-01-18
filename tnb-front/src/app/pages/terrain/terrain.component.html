@@ -1,0 +1,182 @@
+<div class="flex-col space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="font-bold text-2xl">My Slots</div>
+      <div class="text-sm text-orange-400">Manage your slots</div>
+    </div>
+    <hlm-dialog>
+      <button id="edit-profile" *ngIf="!isAdmin" brnDialogTrigger hlmBtn>Add Slots</button>
+      <hlm-dialog-content class="sm:max-w-[425px]" *brnDialogContent="let ctx">
+        <form [formGroup]="terrainForm" (ngSubmit)="onSubmit()">
+        <hlm-dialog-header>
+          <h3 hlmDialogTitle>Add a slot</h3>
+          <p hlmDialogDescription>
+            Make changes to your slot here. Click save when you're done.
+          </p>
+        </hlm-dialog-header>
+        <div class="grid gap-4 py-4">
+          <div class="grid grid-cols-4 items-center gap-4">
+            <label hlmLabel for="name" class="text-right">Name</label>
+            <input hlmInput id="name" formControlName="name" class="col-span-3" />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <label hlmLabel for="address" class="text-right">Address</label>
+            <input hlmInput id="address" formControlName="address" class="col-span-3" />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <label hlmLabel for="area" class="text-right">Area</label>
+            <input
+              hlmInput
+              id="area"
+              type="number"
+              class="col-span-3"
+              min="10"
+              max="30000"
+              formControlName="area"
+            />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <label
+              for="countries"
+              class="block mb-2 font-medium text-gray-900 dark:text-white text-right"
+              >Select a Category</label
+            >
+            <select
+              id="countries"
+              formControlName="category_id"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500 col-span-3"
+            >
+              <option selected>Choose a Category</option>
+              @for(category of CATEGORY_DATA;track category.libelle){
+              <option value="{{category.id}}">{{category.libelle}}</option>
+              }
+            </select>
+          </div>
+
+          <div class="grid grid-cols-4 items-center gap-4">
+            <label hlmLabel for="description" class="text-right"
+              >Description</label
+            >
+            <textarea
+              hlmInput
+              name="description"
+              formControlName="description"
+              placeholder="Type your message here."
+              class="col-span-3"
+            ></textarea>
+          </div>
+        </div>
+        <hlm-dialog-footer>
+          <button hlmBtn type="submit">Save</button>
+        </hlm-dialog-footer>
+        </form>
+      </hlm-dialog-content>
+    </hlm-dialog>
+  </div>
+  <div *ngIf="SLOT_DATA.length<0">
+    No Terrain Found Add One :D
+  </div>
+  <div class="grid grid-cols-1 gap-y-2" >
+    @for (invoice of SLOT_DATA; track invoice.name) {
+    <div hlmAccordion>
+      <div hlmAccordionItem>
+        <button hlmAccordionTrigger>
+          <div class="flex items-center gap-x-20">
+            <div class="text-xs flex items-center gap-x-2 font-bold w-40">
+              <i class="fa-solid fa-house-user"></i>
+              {{ invoice?.name }}
+            </div>
+            <div class="text-xs flex items-center gap-x-2 font-bold w-60">
+              <i class="fa-solid fa-location-dot"></i>
+              {{ invoice.address }}
+            </div>
+            <div class="text-xs flex items-center gap-x-2 font-bold w-20">
+              <i class="fa-solid fa-layer-group"></i>
+              {{ invoice.category.libelle }}
+            </div>
+            <div class="text-xs flex items-center gap-x-2 font-bold w-30">
+              <i class="fa-solid fa-ruler-combined"></i>
+              {{ invoice.area }}
+            </div>
+          </div>
+          <hlm-icon hlmAccIcon />
+        </button>
+        <brn-accordion-content hlm>
+          <div class="grid grid-cols-1 gap-y-3 text-xs">
+            <div class="flex justify-end">
+              <div class="flex items-center gap-x-2">
+                <button size="icon"  (click)="onDeleteTerrain(invoice.id)" class="bg-rose-500 hover:bg-rose-400" hlmBtn>
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+            @for(taxe of invoice?.taxes; track taxe.label){
+            <div class="flex items-center w-full justify-evenly">
+              <div
+                class="h-full w-3 rounded-l-lg"
+                [ngClass]="{
+                  'bg-red-500': taxe.payementType === 'NOT_PAYED',
+                  'bg-orange-500': taxe.payementType === 'LATE',
+                  'bg-emerald-500': taxe.payementType === 'PAYED'
+                }"
+              ></div>
+              <div
+                class="w-full flex cursor-pointer items-center justify-between gap-x-2 px-1 py-2 transition"
+              >
+                <div>
+                  {{ taxe.label }}
+                </div>
+                <div class="flex items-center justify-center">
+                  <div
+                    class="text-emerald-500"
+                    *ngIf="taxe.payementType == 'PAYED'"
+                  >
+                    <i class="fa-solid fa-check-double h-8 w-8 py-2 px-4"></i>
+                  </div>
+                  <div *ngIf="taxe.payementType == 'NOT_PAYED'">
+                    <button
+                      [disabled]="isAdmin"
+                      (click)="payTerrain(taxe.id)"
+                      size="icon"
+                      class="text-xs bg-green-500 hover:bg-green-400"
+                      hlmBtn
+                    >
+                      <i class="fa-solid fa-money-bill-transfer"></i>
+                    </button>
+                  </div>
+                  <div *ngIf="taxe.payementType == 'LATE'">
+                    <button size="icon" class="text-xs" (click)="payTerrain(taxe.id)" [disabled]="isAdmin" hlmBtn>
+                      <i class="fa-solid fa-money-bill"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="flex items-center gap-x-1 relative">
+                  <i class="fa-solid fa-money-bill-transfer"></i>
+                  {{ taxe.amount }} MAD
+                  <div
+                    class="text-white rounded-full px-1 py-1/2 animate-pulse bg-green-400 absolute text-[10px] font-light top-[-50%] right-[-50%]"
+                    *ngIf="taxe.payementType == 'LATE'"
+                  >
+                    + 10%
+                  </div>
+                </div>
+                <div>
+                  <i class="fa-solid fa-stopwatch"></i>
+                  {{ taxe.dueTime }}
+                </div>
+                <div>
+                  <button size="icon" *ngIf="isAdmin" (click)="onDeleteTaxeFromTerrain(taxe.id)" class="bg-rose-500 hover:bg-rose-400" hlmBtn>
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+            }
+          </div>
+        </brn-accordion-content>
+      </div>
+    </div>
+    }
+  </div>
+</div>

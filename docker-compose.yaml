@@ -1,0 +1,107 @@
+version: '3'
+services:
+  eureka-server:
+    container_name: eureka-server
+    build: ./eureka-server
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: [
+        "CMD",
+        "curl",
+        "-f",
+        "http://localhost:8761/actuator/health"
+      ]
+      interval: 10s
+      retries: 3
+  api-gateway:
+    container_name: api-gateway
+    build: ./gateway
+    ports:
+      - "8888:8888"
+    environment:
+      DISCOVERY_SERVICE_URL: http://eureka-server:8761/eureka/
+    healthcheck:
+      test: [
+        "CMD",
+        "curl",
+        "-f",
+        "http://api-gateway:8888/actuator/health"
+      ]
+      interval: 10s
+      retries: 3
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+  taux-service:
+    container_name: taux-service
+    build: ./taux-tnb-service
+    ports:
+      - "8089:8089"
+    environment:
+      DISCOVERY_SERVICE_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: [
+        "CMD",
+        "curl",
+        "-f",
+        "http://taux-service:8089/actuator/health"
+      ]
+      interval: 10s
+      retries: 3
+  taxe-service:
+    container_name: taxe-service
+    build: ./taxe-tnb-service
+    ports:
+      - "8084:8084"
+    environment:
+      DISCOVERY_SERVICE_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: [
+        "CMD",
+        "curl",
+        "-f",
+        "http://taxe-service:8084/actuator/health"
+      ]
+      interval: 10s
+      retries: 3
+  terrain-category-service:
+    container_name: terrain-category-service
+    build: ./terrain-service
+    ports:
+      - "8085:8085"
+    environment:
+      DISCOVERY_SERVICE_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://terrain-category-service:8085/actuator/health"
+        ]
+      interval: 10s
+      retries: 3
+  angular-front:
+    container_name: angular-front
+    build: ./tnb-front
+    ports:
+      - "4200:80"
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+      taux-service:
+        condition: service_healthy
+      taxe-service:
+        condition: service_healthy
+      terrain-category-service:
+        condition: service_healthy
