@@ -1,0 +1,131 @@
+pipeline {
+    agent any
+    tools {
+        maven 'maven'
+        nodejs 'node'
+    }
+
+    stages {
+        stage('Git Clone') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM', branches: [[name: 'master']], userRemoteConfigs: [[url: 'https://github.com/AdilCHBALY/msa-docker-keycloak-r4j-openFeing.git']]])
+                }
+            }
+        }
+        stage('Eureka Server Build') {
+            steps {
+                dir('eureka-server') {
+                    bat 'mvn clean install'
+                }
+            }
+        }
+        stage('Eureka SonarQube Analysis'){
+            steps{
+                dir('eureka-server'){
+                    withSonarQubeEnv('sonarqube-server'){
+                        bat "mvn clean verify sonar:sonar \
+  -Dsonar.projectKey=eureka-server \
+  -Dsonar.projectName='eureka-server' \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=sqp_1362c34c86c64c0c9b8437516fcc86f6c699420e"
+                    }
+                }
+            }
+        }
+        stage('API GateWAY Build') {
+            steps {
+                dir('gateway') {
+                    bat 'mvn clean install'
+                }
+            }
+        }
+        stage('GATEWAY SonarQube Analysis'){
+            steps{
+                dir('gateway'){
+                    withSonarQubeEnv('sonarqube-server'){
+                        bat "mvn clean verify sonar:sonar \
+  -Dsonar.projectKey=gateway \
+  -Dsonar.projectName='gateway' \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=sqp_7367234622190d81c8a3491b39ce80cce3f53461"
+                    }
+                }
+            }
+        }
+        stage('Taux Service Build') {
+            steps {
+                dir('taux-tnb-service') {
+                    bat 'mvn clean install'
+                }
+            }
+        }
+        stage('TAUX Service SonarQube Analysis'){
+            steps{
+                dir('taux-tnb-service'){
+                    withSonarQubeEnv('sonarqube-server'){
+                        bat "mvn clean verify sonar:sonar \
+  -Dsonar.projectKey=taux-service \
+  -Dsonar.projectName='taux-service' \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=sqp_ae29bee089fbc73abfa5aacce4c706b6cb489039"
+                    }
+                }
+            }
+        }
+        stage('Taxe Service Build') {
+            steps {
+                dir('taxe-tnb-service') {
+                    bat 'mvn clean install'
+                }
+            }
+        }
+        stage('Taxe Service SonarQube Analysis'){
+            steps{
+                dir('taxe-tnb-service'){
+                    withSonarQubeEnv('sonarqube-server'){
+                        bat "mvn clean verify sonar:sonar \
+  -Dsonar.projectKey=taxe-service \
+  -Dsonar.projectName='taxe-service' \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=sqp_648ed72f5490a9a307f454c583b6769af6de0ad3"
+                    }
+                }
+            }
+        }
+        stage('Terrain Service Build') {
+            steps {
+                dir('terrain-service') {
+                    bat 'mvn clean install'
+                }
+            }
+        }
+        stage('Terrain Service SonarQube Analysis'){
+            steps{
+                dir('terrain-service'){
+                    withSonarQubeEnv('sonarqube-server'){
+                        bat "mvn clean verify sonar:sonar \
+  -Dsonar.projectKey=terrain-service \
+  -Dsonar.projectName='terrain-service' \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=sqp_5e4c868685001b028f80d8c3301edbbf4fd2b725"
+                    }
+                }
+            }
+        }
+        stage('Create Docker Compose For KeyCloak') {
+             steps {
+                script {
+                    bat "docker compose -f .\\keycload-compose.yml up -d"
+                }
+            }
+        }
+        stage('Create Docker Compose') {
+             steps {
+                script {
+                    bat "docker compose up -d"
+                }
+            }
+        }
+    }
+}
